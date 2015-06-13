@@ -1,0 +1,24 @@
+{
+  "name": "imageHandler",
+  "version": "0.1.0",
+  "description": "A html5 image handler including file selecting, image croping and scaling, finally image to DataURL.",
+  "main": "src/imageHandler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yuhenabc/imagehandler.git"
+  },
+  "keywords": [
+    "image",
+    "crop",
+    "scale"
+  ],
+  "author": "yuhenabc",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yuhenabc/imagehandler/issues"
+  },
+  "homepage": "https://github.com/yuhenabc/imagehandler"
+}
