@@ -10,63 +10,89 @@
     $.imageHandler = {};
 
     $.imageHandler.init = function() {
-        var imageHanglerView = $('<div id="ih-view"></div>');
-        var panelView = $('<div id="ih-panel"></div>');
-        var showArea = $('<div id="ih-show-area"><img id="ih-target"/></div>');
-        var confirmArea = $('<div id="ih-confirm-area"></div>');
-        confirmArea.append($(''));
-        panelView.append(showArea);
-        panelView.append(confirmArea);
-        var hiddeninputs = [];
-        hiddeninputs.push('<input type="hidden" id="ih-crop-x"/>');
-        hiddeninputs.push('<input type="hidden" id="ih-crop-y"/>');
-        hiddeninputs.push('<input type="hidden" id="ih-crop-w"/>');
-        hiddeninputs.push('<input type="hidden" id="ih-crop-h"/>');
-        imageHanglerView.append(panelView);
-        imageHanglerView.append($(hiddeninputs.join('\n')));
-        imageHanglerView.appendTo($(document.body));
-        imageHanglerView.height($(window).height()).width($(window).width());
-        $(imageHanglerView).hide();
+        if (window['isImageHandlerInited']) {
+            return;
+        }
+        var ih = $.imageHandler;
+        ih.view = $('<div id="ih-view"></div>');
+        ih.panel = $('<div id="ih-panel"></div>');
+        ih.target = $('<img id="ih-target"/>');
+        ih.show_area = $('<div id="ih-show-area"></div>');
+        ih.show_area.append(ih.target);
+        ih.confirm_area = $('<div id="ih-confirm-area"></div>');
+        ih.panel.append(ih.show_area);
+        ih.panel.append(ih.confirm_area);
+        ih.view.append(ih.panel);
+        ih.view.hide();
+        ih.view.appendTo($(document.body));
+        ih.view.height(document.documentElement.clientHeight);
+        window.onresize = function() {
+            ih.view.height(document.documentElement.clientHeight);
+        };
+        window['isImageHandlerInited'] = true;
     };
+
+    // crop info
+    $.imageHandler.cropX = 0;
+    $.imageHandler.cropY = 0;
+    $.imageHandler.cropW = 0;
+    $.imageHandler.cropH = 0;
 
     // update info by cropping (onChange and onSelect events handler)
     $.imageHandler.updateInfo = function (e) {
-        $('#ih-crop-x').val(e.x);
-        $('#ih-crop-y').val(e.y);
-        $('#ih-crop-w').val(e.w);
-        $('#ih-crop-h').val(e.h);
+        var ih = $.imageHandler;
+        ih.cropX = e.x;
+        ih.cropY = e.y;
+        ih.cropW = e.w;
+        ih.cropH = e.h;
     };
 
     // clear info by cropping (onRelease event handler)
     $.imageHandler.clearInfo = function () {
-        $('#ih-crop-x').val('');
-        $('#ih-crop-y').val('');
-        $('#ih-crop-w').val('');
-        $('#ih-crop-h').val('');
+        var ih = $.imageHandler;
+        ih.cropX = 0;
+        ih.cropY = 0;
+        ih.cropW = 0;
+        ih.cropH = 0;
+    };
+
+    // show view
+    $.imageHandler.show = function () {
+        var ih = $.imageHandler;
+        if (ih.view.is(':hidden')) {
+            ih.view.fadeIn();
+        }
+        return ih;
+    };
+
+    // hide view
+    $.imageHandler.hide = function () {
+        var ih = $.imageHandler;
+        if (ih.view.is(':visible')) {
+            ih.view.hide();
+        }
+        return ih;
     };
 
     $.imageHandler.create = function (opts) {
-
+        var ih = $.imageHandler;
+        ih.init();
         var options = $.extend({}, $.imageHandler.defaults, opts);
-        options.fileInputId = '#' + options.fileInputId;
+        var $file_input = $('#'+options.fileInputId);
 
         function _shower(file) {
 
             // show view if hidden
-            var $view = $('#ih-view');
-            if ($view.is(':hidden')) {
-                $view.fadeIn();
-            }
+            ih.show();
 
             // preview element
-            var oImage = $('#ih-target').get(0);
+            var oImage = ih.target.get(0);
 
             // prepare HTML5 FileReader
             var oReader = new FileReader();
             oReader.onload = function (e) {
                 // e.target.result contains the DataURL which we can use as a source of the image
                 oImage.src = e.target.result;
-
                 $(oImage).unbind();
                 var jcropHolder = $('.jcrop-holder');
                 if (jcropHolder.length > 0) {
@@ -86,8 +112,8 @@
                         boxHeight: options.boxSize[1],
                         bgFade: true,
                         bgOpacity: .3,
-                        onSelect: $.imageHandler.updateInfo,
-                        onRelease: $.imageHandler.clearInfo
+                        onSelect: ih.updateInfo,
+                        onRelease: ih.clearInfo
                     }, function () {
                         // use the Jcrop API to get the real image size
                         var bounds = this.getBounds();
@@ -105,24 +131,24 @@
         function _consider() {
 
             // get selected file (only one)
-            var oFile = $(options.fileInputId).get(0).files[0];
+            var oFile = $file_input.get(0).files[0];
 
             // check is image slected
             if (typeof(oFile) == 'undefined') {
-                console.log('请选择一张图片');
+                options.error('请选择一张图片');
                 return;
             }
 
             // check for image type (jpg and png are allowed)
             var regex = /^(image\/jpeg|image\/png)$/i;
             if (!regex.test(oFile.type)) {
-                console.log('仅支持 png 和 jpg 格式的图片');
+                options.error('仅支持 png 和 jpg 格式的图片');
                 return;
             }
 
             // check if browser support HTML5 FileReader
             if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
-                console.log('您的浏览器不支持 HTML5，请更换浏览器！');
+                options.error('您的浏览器不支持 HTML5，请更换浏览器！');
                 return;
             }
 
@@ -138,7 +164,7 @@
                     if (options.cropRatio >= 0) {
                         if (imgSize[0] < options.cropMinSize[0] || imgSize[1] < options.cropMinSize[1]) {
                             // 这张图片太小了
-                            console.log('请选择大于' + options.cropMinSize[0] + 'x' + options.cropMinSize[1] + '图片');
+                            options.error('请选择大于' + options.cropMinSize[0] + 'x' + options.cropMinSize[1] + '图片');
                         } else {
                             if (imgSize[0] / imgSize[1] == options.cropRatio) {
                                 // 这张图片符合比例
@@ -211,52 +237,44 @@
 
         function _collecter() {
             var imageData;
-            // get crop info from page's hidden inputs
-            var cropX = Math.round(parseFloat($('#ih-crop-x').val())) || 0,
-                cropY = Math.round(parseFloat($('#ih-crop-y').val())) || 0,
-                cropW = Math.round(parseFloat($('#ih-crop-w').val())) || 0,
-                cropH = Math.round(parseFloat($('#ih-crop-h').val())) || 0,
-                imgSource = $('#ih-target').get(0);
-            if (cropW == 0 || cropH == 0) {
-                console.log('请拖动鼠标来剪裁图片！');
-            } else if (cropW <= options.targetSize[0]) {
-                imageData = _croper(imgSource, cropX, cropY, cropW, cropH);
-                options.success(imageData);
+            var imgSource = $('#ih-target').get(0);
+            if (ih.cropW == 0 || ih.cropH == 0) {
+                options.error('请拖动鼠标来剪裁图片！');
+            } else if (ih.cropW <= options.targetSize[0]) {
+                imageData = _croper(imgSource, ih.cropX, ih.cropY, ih.cropW, ih.cropH);
+                if (options.success) {
+                    options.success(imageData);
+                }
+                ih.hide();
             } else {
-                imageData = _croper(imgSource, cropX, cropY, cropW, cropH);
+                imageData = _croper(imgSource, ih.cropX, ih.cropY, ih.cropW, ih.cropH);
                 var imageURL = 'data:image/png;base64,' + imageData;
                 var tempimg = new Image();
                 tempimg.src = imageURL;
                 imageData = _scaler(tempimg, options.targetSize[0], options.targetSize[1]);
-                options.success(imageData);
+                if (options.success) {
+                    options.success(imageData);
+                }
+                ih.hide();
             }
         }
 
-
-        if (options.fileInputId) {
-            $(options.fileInputId).change(function () {
+        if ($file_input.length > 0) {
+            $file_input.change(function () {
                 _consider();
-                var $confirm_btn = $('<div id="ih-confirm-btn"><span>确定</span><input type="submit" /></div>');
-                var $quit_btn = $('<div id="ih-quit-btn"><span>取消</span><input type="button" /></div>');
-
+                var $confirm_btn = $('<div id="ih-confirm-btn">确定</div>');
+                var $quit_btn = $('<div id="ih-cancel-btn">取消</div>');
                 $confirm_btn.click(function () {
                     _collecter();
-                    $.imageHandler.clearInfo();
+                    ih.clearInfo();
+                    $file_input.val('');
                 });
-
                 $quit_btn.click(function () {
-                    var $view = $('#ih-view');
-                    if ($view.is(':visible')) {
-                        $view.hide();
-                    }
-                    $.imageHandler.clearInfo();
+                    ih.hide();
+                    ih.clearInfo();
+                    $file_input.val('');
                 });
-
-                var $confirm_area = $('#ih-confirm-area');
-                $confirm_area.empty();
-                $confirm_area.append($confirm_btn);
-                $confirm_area.append($quit_btn);
-
+                ih.confirm_area.empty().append($confirm_btn).append($quit_btn);
             });
         }
     };
@@ -270,7 +288,7 @@
         cropRatio: 32 / 15,        // 0 is for requireless
         fileInputId: null,         // input[type=file] 's ID
         success: function (data) {console.log(data)},     // function after confirm verifying passed
-        error: function(data) {console.log(data.message)}
+        error: function(data) {console.log(data)}
     };
 
 })(jQuery);

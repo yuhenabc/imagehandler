@@ -1,1 +1,6 @@
-#ih-view {position: absolute; top:0; left: 0;}
+#ih-view {position: absolute; width: 100%; top:0; left: 0; background-color: rgba(10,10,10,.5);}
+#ih-panel {max-width: 700px; margin: 0 auto; padding: 20px; background-color: white; border: 4px solid #848484; border-radius: 10px; position: relative; top: 50px;}
+#ih-show-area {min-height: 200px; padding: 20px 0 10px;}
+#ih-show-area .jcrop-holder {margin: 0 auto;}
+#ih-confirm-area {height: 60px; padding: 10px 0 20px; box-sizing: border-box; text-align: center;}
+#ih-confirm-btn, #ih-cancel-btn {height: 30px; width: 70px; background-color: #449d44; display: inline-block; margin: 0 1.5em;line-height: 30px; color: white; border-radius: 2px;}
