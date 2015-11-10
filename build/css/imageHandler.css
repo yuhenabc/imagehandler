@@ -1,4 +1,4 @@
-#ih-view {position: absolute; width: 100%; top:0; left: 0; background-color: rgba(10,10,10,.5);}
+#ih-view {position: fixed; width: 100%; top:0; bottom: 0; left: 0; background-color: rgba(10,10,10,.5); overflow-x: hidden; overflow-y: auto; z-index: 1000;}
 #ih-panel {max-width: 700px; margin: 0 auto; padding: 20px; background-color: white; border: 4px solid #848484; border-radius: 10px; position: relative; top: 50px;}
 #ih-show-area {min-height: 200px; padding: 20px 0 10px;}
 #ih-show-area .jcrop-holder {margin: 0 auto;}
