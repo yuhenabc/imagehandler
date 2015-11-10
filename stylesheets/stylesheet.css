@@ -470,8 +470,8 @@ header h2 {
   width: 540px;
   margin-top: 0;
   margin-bottom: 0;
-  font-size: 26px;
-  font-weight: normal;
+  font-size: 20px;
+  font-weight: lighter;
   line-height: 1.3;
   color: #9ddcff;
   letter-spacing: 0;
@@ -657,7 +657,7 @@ form {
 #main-content h3:before {
   padding-right: 0.3em;
   margin-left: -2em;
-  content: "///";
+  content: "#";
   color: #9ddcff;
 }
 
@@ -725,14 +725,12 @@ blockquote {
 }
 
 ul {
-  list-style-position: inside;
-  list-style: disc;
+  list-style: disc inside;
   padding-left: 20px;
 }
 
 ol {
-  list-style-position: inside;
-  list-style: decimal;
+  list-style: decimal inside;
   padding-left: 3px;
 }
 
@@ -747,7 +745,6 @@ footer {
   margin-top: 40px;
   font-size: 13px;
   color: #aaa;
-  background: transparent url('../images/hr.png') 0 0 no-repeat;
 }
 
 footer a {
