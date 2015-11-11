@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>imageHandler demo</title>
+    <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="lib/jcrop/css/jquery.Jcrop.min.css" rel="stylesheet" type="text/css">
+    <link href="../src/imageHandler.css" rel="stylesheet" type="text/css">
+    <script src="lib/jquery/jquery.min.js"></script>
+    <script src="lib/jcrop/js/jquery.Jcrop.min.js"></script>
+    <script src="../src/imageHandler.js"></script>
+    <style>
+        #img-box {width: 160px; height: 160px; background-color: #eee; display: table;}
+        #img-box span {display: table-cell; vertical-align: middle; text-align: center; font-size: 0;}
+        #img-box span img {width: 100%; max-width: 160px; max-height: 160px;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1 class="text-center">imageHandler 测试</h1>
+    </div>
+    <div class="page-body">
+        <div class="col-xs-12">
+            <div class="col-sm-8 col-sm-offset-4" style="margin-bottom: 20px;">
+                <div id="img-box"><span></span></div>
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="col-sm-4 col-sm-offset-4">
+                <button class="btn btn-success" id="btn1">选择一张图片</button>
+            </div>
+            <div class="col-sm-2">
+                <div class="help-block">
+                    <a href="index.html">
+                        <i class="glyphicon glyphicon-envelope"></i>
+                        <span>捐助我们</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="display: none;">
+    <input type="file" name="file1" id="file1">
+</div>
+
+<script>
+    $(function() {
+        var $btn1 = $('#btn1');
+        var $file1 = $('#file1');
+        var $imgbox = $('#img-box');
+        $btn1.on('click', function() {
+            $file1.click();
+        });
+        $.imageHandler.create({
+            imageMaxKB: null,
+            boxSize: [640, 420],
+            cropInitSize: [400, 400],
+            targetSize: [400, 400],
+            cropMinSize: [400, 400],
+            cropRatio: 1,
+            fileInputId: 'file1',
+            success: function (data) {
+                console.log('success');
+                var img = new Image();
+                img.src = 'data:image/png;base64,'+data;
+                $imgbox.find('span').first().empty().append(img);
+            },
+            error: function(data) {
+                alert(data);
+            }
+        });
+    });
+</script>
+</body>
+</html>
