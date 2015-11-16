@@ -170,10 +170,10 @@
                                 // 这张图片符合比例
                                 if (imgSize[0] > options.targetSize[0]) {
                                     // 这张图片可以自动缩小
-                                    options.success(_scaler(vimage, options.targetSize[0], options.targetSize[1]));
+                                    options.success(_scaler(vimage, imgSize[0], imgSize[1], options.targetSize[0], options.targetSize[1]));
                                 } else {
                                     // 这张图片正好
-                                    options.success(_scaler(vimage, imgSize[0], imgSize[1]));
+                                    options.success(vimage.src);
                                 }
                             } else {
                                 // 这张图片需要剪裁
@@ -181,21 +181,21 @@
                             }
                         }
                     } else {
-                        if (imgSize[0] > options.boxSize[0] || imgSize[1] > options.boxSize[1]) {
+                        if (imgSize[0] > options.targetSize[0] || imgSize[1] > options.targetSize[1]) {
                         // 这张图片需要缩小
-                            if (imgSize[0] / imgSize[1] > options.boxSize[0] / options.boxSize[1]) {
+                            if (imgSize[0] / imgSize[1] > options.targetSize[0] / options.targetSize[1]) {
                                 // 这张图片是矮胖型的
-                                options.success(_scaler(vimage, options.boxSize[0], Math.round(imgSize[1] * options.boxSize[0] / imgSize[0])));
-                            } else if (imgSize[0] / imgSize[1] < options.boxSize[0] / options.boxSize[1]) {
+                                options.success(_scaler(vimage, imgSize[0], imgSize[1], options.targetSize[0], Math.round(imgSize[1] * options.targetSize[0] / imgSize[0])));
+                            } else if (imgSize[0] / imgSize[1] < options.targetSize[0] / options.targetSize[1]) {
                                 // 这张图片是瘦高型的
-                                options.success(_scaler(vimage, Math.round(imgSize[0] * options.boxSize[1] / imgSize[1]), options.boxSize[1]));
+                                options.success(_scaler(vimage, imgSize[0], imgSize[1], Math.round(imgSize[0] * options.targetSize[1] / imgSize[1]), options.targetSize[1]));
                             } else {
                                 // 这张图片是加大型的
-                                options.success(_scaler(vimage, options.boxSize[0], options.boxSize[1]));
+                                options.success(_scaler(vimage, imgSize[0], imgSize[1], options.targetSize[0], options.targetSize[1]));
                             }
                         } else {
                             // 这张图片不需要缩小
-                            options.success(vimage.src.split(";base64,")[1]);
+                            options.success(vimage.src);
                         }
                     }
                 }
@@ -203,36 +203,25 @@
         }
 
         // zoom in/out a image to target size. 'source' must be a Image object
-        function _scaler(source, w, h) {
-            var image = new Image();
-            image.src = source.src;
+        function _scaler(source, ow, oh, w, h) {
+            //console.log(ow, oh, w, h);
             var canvas = document.createElement('canvas');
-            $(canvas).attr('width', w);
-            $(canvas).attr('height', h);
-            $(canvas).hide();
+            canvas.width = w;
+            canvas.height = h;
             var context = canvas.getContext('2d');
-            context.drawImage(image, 0, 0, w, h);
-            //canvas.hide();
-            var dataURL = canvas.toDataURL('image/png');
-            return dataURL.split(";base64,")[1];
+            context.drawImage(source, 0, 0, ow, oh, 0, 0, w, h);
+            return canvas.toDataURL();
         }
 
         // realy crop a iamge to a new one.  'source' must be a Image object
         function _croper(source, x, y, w, h) {
-            // console.log([x,y,w,h]);
-            // console.log(source.src);
-            var image = new Image();
-            image.src = source.src;
+            //console.log(x, y, w, h);
             var canvas = document.createElement('canvas');
-            $(canvas).attr('width', w);
-            $(canvas).attr('height', h);
-            $(canvas).hide();
+            canvas.width = w;
+            canvas.height = h;
             var context = canvas.getContext('2d');
-            context.drawImage(image, x, y, w, h, 0, 0, w, h);
-            //canvas.hide();
-            //console.log(canvas.toDataURL('image/png'));
-            var dataURL = canvas.toDataURL('image/png');
-            return dataURL.split(";base64,")[1];
+            context.drawImage(source, x, y, w, h, 0, 0, w, h);
+            return canvas.toDataURL();
         }
 
         function _collecter() {
@@ -240,7 +229,7 @@
             var imgSource = $('#ih-target').get(0);
             if (ih.cropW == 0 || ih.cropH == 0) {
                 options.error('请拖动鼠标来剪裁图片！');
-            } else if (ih.cropW <= options.targetSize[0]) {
+            } else if (options.cropRatio && ih.cropW <= options.targetSize[0]) {
                 imageData = _croper(imgSource, ih.cropX, ih.cropY, ih.cropW, ih.cropH);
                 if (options.success) {
                     options.success(imageData);
@@ -248,13 +237,26 @@
                 ih.hide();
             } else {
                 imageData = _croper(imgSource, ih.cropX, ih.cropY, ih.cropW, ih.cropH);
-                var imageURL = 'data:image/png;base64,' + imageData;
-                var tempimg = new Image();
-                tempimg.src = imageURL;
-                imageData = _scaler(tempimg, options.targetSize[0], options.targetSize[1]);
-                if (options.success) {
-                    options.success(imageData);
-                }
+                var vimage = new Image();
+                vimage.src = imageData;
+                vimage.onload = function() {
+                    var imgSize = [this.width, this.height];
+                    if (options.cropRatio) {
+                        options.success(_scaler(vimage, imgSize[0], imgSize[1], options.targetSize[0], options.targetSize[1]));
+                    } else {
+                        if (imgSize[0] > options.targetSize[0] || imgSize[1] > options.targetSize[1]) {
+                            if (imgSize[0] / imgSize[1] > options.targetSize[0] / options.targetSize[1]) {
+                                options.success(_scaler(vimage, imgSize[0], imgSize[1], options.targetSize[0], Math.round(imgSize[1] * options.targetSize[0] / imgSize[0])));
+                            } else if (imgSize[0] / imgSize[1] < options.targetSize[0] / options.targetSize[1]) {
+                                options.success(_scaler(vimage, imgSize[0], imgSize[1], Math.round(imgSize[0] * options.targetSize[1] / imgSize[1]), options.targetSize[1]));
+                            } else {
+                                options.success(_scaler(vimage, imgSize[0], imgSize[1], options.targetSize[0], options.targetSize[1]));
+                            }
+                        } else {
+                            options.success(imageData);
+                        }
+                    }
+                };
                 ih.hide();
             }
         }
@@ -282,11 +284,11 @@
     $.imageHandler.defaults = {
         imageMaxKB: null,
         boxSize: [640, 420],
-        cropInitSize: [160, 75],
-        targetSize: [640, 300],
-        cropMinSize: [320, 150],
-        cropRatio: 32 / 15,        // 0 is for requireless
-        fileInputId: null,         // input[type=file] 's ID
+        targetSize: [1000, 1000],
+        cropInitSize: [100, 100],
+        cropMinSize: [50, 50],
+        cropRatio: 0,                                     // less than 0 is for requireless, 0 is for freedom, more than 0 is for require
+        fileInputId: null,                                // input[type=file] 's ID
         success: function (data) {console.log(data)},     // function after confirm verifying passed
         error: function(data) {console.log(data)}
     };
