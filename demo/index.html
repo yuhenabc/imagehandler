@@ -12,7 +12,7 @@
     <style>
         #img-box {width: 160px; height: 160px; background-color: #eee; display: table;}
         #img-box span {display: table-cell; vertical-align: middle; text-align: center; font-size: 0;}
-        #img-box span img {width: 100%; max-width: 160px; max-height: 160px;}
+        #img-box span img {max-width: 160px; max-height: 160px;}
     </style>
 </head>
 <body>
@@ -56,16 +56,15 @@
         });
         $.imageHandler.create({
             imageMaxKB: null,
-            boxSize: [640, 420],
-            cropInitSize: [400, 400],
-            targetSize: [400, 400],
-            cropMinSize: [400, 400],
-            cropRatio: 1,
+            cropInitSize: [200, 200],
+            targetSize: [500, 500],
+            cropMinSize: [100, 100],
+            cropRatio: 0,
             fileInputId: 'file1',
             success: function (data) {
                 console.log('success');
                 var img = new Image();
-                img.src = 'data:image/png;base64,'+data;
+                img.src = data;
                 $imgbox.find('span').first().empty().append(img);
             },
             error: function(data) {
