@@ -26,21 +26,56 @@
     <div class="inner clearfix">
         <section id="main-content">
             <h3>Install</h3>
-            <p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through
-                them. You can easily go back to edit your page before publishing. After publishing your page, you can
-                revisit the page generator and switch to another theme. Your Page content will be preserved if it
-                remained markdown format.</p>
+            <p>If you use bower, just go like: <code>bower install jquery jcrop imageHandler</code><br>
+                Otherwise, you can download from the "download" button on right side and copy to your directory.</p>
             <h3>Usage</h3>
-            <p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your
-                repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages
-                support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll
-                makes it easy to create site-wide headers and footers without having to copy them across every page. It
-                also offers intelligent blog support and other advanced templating features.</p>
+            <p>Depend on:</p>
+            <p><pre>jquery, Jcrop</pre></p>
+            <p>Files:</p>
+            <p>
+<pre>
+    build
+    ├── css
+    │   ├── imageHandler.css
+    │   └── imageHandler.min.css
+    └── js
+        ├── imageHandler.js
+        └── imageHandler.min.js
+</pre>
+            </p>
+            <p>HTML:</p>
+            <p>
+<pre>
+    &lt;link href="(some directory...)/jquery.Jcrop.min.css" rel="stylesheet" type="text/css"&gt;<br>
+    &lt;link href="(some directory...)/imageHandler.css" rel="stylesheet" type="text/css"&gt;<br>
+    &lt;script src="(some directory...)/jquery.min.js"&gt;&lt;/script&gt;<br>
+    &lt;script src="(some directory...)/jquery.Jcrop.min.js"&gt;&lt;/script&gt;<br>
+    &lt;script src="(some directory...)/imageHandler.js"&gt;&lt;/script&gt;
+</pre>
+            </p>
+            <p>Javacript:</p>
+            <p>
+<pre>
+    $.imageHandler.create({
+        imageMaxKB: null,
+        cropInitSize: [200, 200],
+        targetSize: [500, 500],
+        cropMinSize: [100, 100],
+        cropRatio: 0,                    // less than 0 is for requireless, 0 is for freedom, more than 0 is for require
+        fileInputId: 'file1',            // input[type=file] 's ID
+        success: function (data) {       // function after confirm verifying passed
+            // do something with data
+        },
+        error: function(err) {
+            // do something
+        }
+    });
+</pre>
+            </p>
             <h3>Demo</h3>
-            <p><a href="demo">here</a></p>
+            <p><a href="demo">Click here.</a></p>
             <h3>Support or Contact</h3>
-            <p>Having trouble with Pages? Check out the documentation at <a href="https://help.github.com/pages">https://help.github.com/pages</a>
-                or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.
+            <p>Having trouble with imageHandler? Contact <a href="mailto:support@github.com">yuhenabc@126.com</a> and I’ll help you sort it out.
             </p>
         </section>
         <aside id="sidebar">
