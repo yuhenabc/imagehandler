@@ -1,7 +1,7 @@
 /**
  *  imageHangler.js
  *  yuhenabc
- *  opyright 2015, MIT License
+ *  copyright 2015, MIT License
  *  https://github.com/yuhenabc/imagehandler
  */
 
